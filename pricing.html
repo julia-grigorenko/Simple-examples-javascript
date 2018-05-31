@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Pricing calculator for pies</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+    body, .jumbotron {padding: 30px;}
+    .text-giant {font-size: 40px;}
+  </style>
+</head>
+<body>
+  <div class="jumbotron">
+    <h2>How much do pies cost? </h2>
+    <form action="#">
+      <div class="form-group">
+        <label for="price">Price</label>
+        <input class="form-control" type="text" name="price" value="20">
+      </div>
+      <div class="form-group">
+        <label for="quantity">
+          Quantity
+          <span class="label label-primary quantity-label">1</span>
+        </label>
+        <input class="form-control" type="range" name="quantity" value="1" min="0" max="10" step="1">
+      </div>
+    </form>
+    <div class="text-right text-giant total">$30</div>
+  </div>
+  <script>
+
+    let priceInput = document.querySelector('[name=price]');
+    let quantityInput = document.querySelector('[name=quantity]');
+    let qtyLabel = document.querySelector('.quantity-label');
+    let total = document.querySelector('.total');
+
+    let calculate = function () {
+      let price = priceInput.value;
+      let quantity = quantityInput.value;
+      let cost = price * quantity;
+      total.textContent = cost;
+    };
+
+    calculate();
+    priceInput.addEventListener('input',calculate);
+    quantityInput.addEventListener('input',calculate);
+    quantityInput.addEventListener('input',function (){
+      qtyLabel.textContent = quantityInput.value;
+    });
+  </script>
+</body>
+</html>
