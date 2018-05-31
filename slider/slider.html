@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Slider</title>
+    <style media="screen">
+      h1{
+        color: black;
+        margin: 25px auto;
+        font-weight: bold;
+        text-align: center;
+        color: #898AA2;
+      }
+      .wrapper{
+        max-width: 1000px;
+        position: relative;
+        margin: 100px auto;
+      }
+      .slideCard{
+        display: block;
+        margin: 0 auto;
+      }
+      .btn-wrapper{
+        display: flex;
+        width: 30%;
+        margin: 0 auto;
+        justify-content:space-around;
+      }
+      .btn1, .btn2{
+        font-size: 18px;
+        font-family: Tahoma;
+        padding: 40px;
+        border-radius: 30px;
+        background-color: lightgrey;
+      }
+      .hide {
+        display: none;
+      }
+      .show {
+        display:block;
+      }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+      <h1> Image Slider </h1>
+      <img class="slideCard" src="1.png" alt="hipster girl" width="300" height="680">
+      <img class="slideCard" src="2.png" alt="hipster girl" width="300" height="680">
+      <img class="slideCard" src="3.png" alt="hipster girl" width="300" height="680">
+      <img class="slideCard" src="4.png" alt="hipster girl" width="300" height="680">
+      <img class="slideCard" src="5.png" alt="hipster girl" width="300" height="680">
+
+      <div class="btn-wrapper">
+        <button class="btn1">&lt;</button>
+        <button class="btn2">&gt;</button>
+      </div>
+    </div>
+    <script>
+      
+      var init =  function () {
+        var cards, current, previous, rightBtn, leftBtn;
+
+        cards = document.querySelectorAll('.slideCard');
+        current = 1;
+        previous = 0;
+        rightBtn = document.querySelector('.btn2');
+        leftBtn = document.querySelector('.btn1');
+
+        for (var i = 0; i < cards.length; i++ ){
+          cards[i].classList.toggle('hide');
+        }
+
+        cards[current].classList.toggle('hide');
+
+        var showSlides = function (step) {
+          previous = current;
+          console.log(cards.length);
+          if (current == cards.length - 1  && step == +1){
+            current = -1;
+          } else if (current == 0 && step == -1) {
+            current = cards.length;
+          }
+          current += step;
+
+          cards[previous].classList.toggle('hide');
+          cards[current].classList.toggle('hide');
+        };
+
+
+        rightBtn.addEventListener('click', showSlides.bind(null,+1));
+        leftBtn.addEventListener('click', showSlides.bind(null,-1));
+      };
+
+    init();
+
+    </script>
+</body>
+</html>
