@@ -62,13 +62,11 @@ function removeTweet(e){
     tweetsLS = getTweetsFromStorage();
 
 
-    tweetsLS.forEach(function(cur) {
+    tweetsLS.forEach(function(cur, index) {
       if (tweet === cur){
-        id = tweetsLS.indexOf(cur);
+        tweetsLS.splice(index,1);
       }
     });
-
-    tweetsLS.splice(id,1);
 
     addTweetLocalStorage (tweetsLS);
   }
