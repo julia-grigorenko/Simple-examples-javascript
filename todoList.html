@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <h2>To do list app</h2>
+
+  <script>
+    const todos = [{
+      text:'order cat food',
+      completed: false
+    },{
+      text:'clean kitchen',
+      completed: true
+    },{
+      text: 'buy food',
+      completed: true
+    },{
+      text:'do work',
+      completed: false
+    },{
+      text:'do exercise',
+      completed:true
+    }];
+
+    const incompleteTodos = todos.filter(function (todo) {
+      return !todo.completed;
+    });
+
+    const summary = document.createElement('b');
+    summary.textContent = `You have ${incompleteTodos.length} todos left`;
+    document.querySelector('body').appendChild(summary);
+
+    todos.forEach(function (todo) {
+      const p = document.createElement('p');
+      p.textContent = todo.text;
+      document.querySelector('body').appendChild(p);
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </script>
+</body>
+</html>
