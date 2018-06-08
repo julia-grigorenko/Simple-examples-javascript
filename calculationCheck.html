@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Calculation Check for kids</title>
+  <style media="screen">
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 500px;
+      margin: 250px auto;
+      padding: 35px;
+      background-color: lightgrey;
+      border-radius: 25px;
+    }
+    .operation {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .text {
+      font-size: 45px;
+      font-weight: bold;
+      color: #ffffff;
+    }
+    .num {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      width: 110px;
+      height: 130px;
+      -webkit-box-shadow: 14px 11px 58px -19px rgba(40,26,235,0.57);
+      -moz-box-shadow: 14px 11px 58px -19px rgba(40,26,235,0.57);
+      box-shadow: 14px 11px 58px -19px rgba(40,26,235,0.57);
+    }
+    .num--1{
+      background-color: lightpink;
+    }
+    .num--2{
+      background-color: lightblue;
+    }
+    .input_field{
+      width: 110px;
+      height: 130px;
+      color: #c5c5c5;
+      border: none;
+      border-radius: 10px;
+      text-align: center;
+      -webkit-box-shadow: 14px 11px 58px -19px rgba(40,26,235,0.57);
+      -moz-box-shadow: 14px 11px 58px -19px rgba(40,26,235,0.57);
+      box-shadow: 14px 11px 58px -19px rgba(40,26,235,0.57);
+    }
+    .input_field__border{
+      width: 100px;
+      height: 120px;
+    }
+    .btn {
+      padding: 15px 25px;
+      margin: 50px auto;
+      background-color: lightgreen;
+      color:#ffffff;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+    }
+    .btn:active {
+      outline-color: green;
+    }
+    .btn:focus {
+        outline-color: green;
+    }
+    .btn:hover {
+      background-color: #449d44;
+    }
+    .goodAnswer {
+      border: 5px solid lightgreen;
+    }
+    .badAnswer {
+      border: 5px solid pink;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="operation">
+      <span class="text num num--1">1</span>
+      <span class="text sign sign--sum">+</span>
+      <span class="text num num--2">2</span>
+      <span class="text sign sign--equals">=</span>
+      <input type="text" class="text input_field">
+    </div>
+    <button type="button" value="" class="btn btn-lg btn-success">Check</button>
+  </div>
+  <script>
+
+      // Variables
+      const number1El = document.querySelector('.num--1');
+      const number2El = document.querySelector('.num--2');
+      const result = document.querySelector('.input_field');
+      const btn = document.querySelector('.btn');
+      let nums = {};
+
+      // Event Listeners
+      btn.addEventListener('click', check);
+
+      // Functions
+      function clearAll (){
+        number1El.textContent = '';
+        number2El.textContent = '';
+        result.value = "";
+        result.focus();
+        result.classList.remove('badAnswer');
+        result.classList.remove('goodAnswer');
+        result.classList.remove('input_field__border');
+      }
+
+      function getNumbers () {
+        nums = {
+          number1: Math.floor(Math.random()*10+1),
+          number2: Math.floor(Math.random()*10+1)
+        };
+      }
+
+      function printNumbers (obj) {
+        number1El.textContent = obj.number1;
+        number2El.textContent = obj.number2;
+      }
+
+      function checkAnswer(obj) {
+        const userResult = parseInt(result.value);
+        console.log(userResult);
+        const mathResult = parseInt(obj.number1) + parseInt(obj.number2);
+        console.log(mathResult);
+        if(userResult === mathResult) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      function highlightAnswer (answ){
+        if(answ) {
+          result.classList.add('goodAnswer');
+          result.classList.add('input_field__border');
+
+        }else{
+          result.classList.add('badAnswer');
+          result.classList.add('input_field__border');
+        }
+      }
+
+      function init() {
+        clearAll();
+        getNumbers();
+        printNumbers(nums);
+      }
+
+      function check(){
+        answ = checkAnswer(nums);
+        highlightAnswer(answ);
+        btn.blur();
+        setTimeout(init, 2000);
+      }
+
+      // Init app
+      init();
+
+  </script>
+</body>
+</html>
