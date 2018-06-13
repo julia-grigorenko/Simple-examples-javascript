@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Getting Started with JavaScript</title>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+    body, .jumbotron { padding: 30px; }
+    .timer           {
+      font-size: 120px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="jumbotron text-center">
+
+    <!-- timer -->
+    <div class="timer">
+      <span class="minutes">00</span> : <span class="seconds">00</span>
+    </div>
+
+    <!-- timer buttons -->
+    <div class="timer-buttons">
+      <button class="btn btn-lg btn-success" data-action="start">
+        Start
+      </button>
+      <button class="btn btn-lg btn-danger" data-action="stop">
+        Stop
+      </button>
+      <button class="btn btn-link btn-block" data-action="reset">
+        Reset
+      </button>
+    </div>
+  </div>
+  <script>
+  // Variables
+  const btnStart = document.querySelector('[data-action = "start"]');
+  const btnStop = document.querySelector('[data-action = "stop"]');
+  const btnReset = document.querySelector('[data-action = "reset"]');
+  const minutes = document.querySelector('.minutes');
+  const seconds = document.querySelector('.seconds');
+  let timerTime = 0;
+  let interval;
+  let isRunning = false;
+
+  // Event listeners
+  btnStart.addEventListener('click', startTimer);
+  btnStop.addEventListener('click', stopTimer);
+  btnReset.addEventListener('click', resetTimer);
+
+  // Functions
+function startTimer () {
+  if(isRunning) { return; }
+
+  isRunning = true;
+  interval = setInterval(incrementTimer, 1000);
+}
+
+function stopTimer () {
+  if(!isRunning) { return; }
+  isRunning = false;
+  clearInterval(interval);
+}
+
+function resetTimer () {
+  stopTimer();
+
+  timerTime = 0;
+  seconds.textContent = '00';
+  minutes.textContent = '00';
+
+  btnReset.blur();
+}
+
+function pad (number) {
+  return (number < 10) ? '0' + number : number;
+}
+
+function incrementTimer () {
+  timerTime ++;
+
+  const numOfMinutes = Math.floor(timerTime / 60);
+  const numOfSeconds = timerTime % 60;
+
+  seconds.textContent = pad(numOfSeconds);
+  minutes.textContent = pad(numOfMinutes);
+}
+
+  </script>
+</body>
+</html>

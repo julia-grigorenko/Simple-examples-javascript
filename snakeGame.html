@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Snake game</title>
+  <style type='text/css'>
+      div {
+          margin: 0;
+          padding: 0;
+      }
+      .snake {
+          border: 1px solid #000;
+          margin: 0 auto;
+          display: block;
+      }
+
+      .msg {
+          display: flex;
+          justify-content: space-around;
+          width: 300px;
+          margin: 0 auto;
+          border: 1px solid #000;
+          padding: 5px 0;
+          font-size: 12px;
+          text-align: center;
+          border-top: none;
+      }
+      .description {
+        font-size: 18px;
+      }
+      .btn {
+        width: 30%;
+      }
+  </style>
+</head>
+<body>
+  <canvas class='snake' id='snake' width="300" height="400"></canvas>
+  <div class='msg'>
+    <div><span class='description'>score </span><span class='description' id='score'>0</span></div>
+    <div><span class='description'>level </span><span class='description' id='level'>1</span></div>
+  </div>
+  <div class='tool msg'>
+      <input type='button' class='btn' value='start' id="start_btn" />
+      <input type='button' class='btn' value='new game' id="new_game_btn" />
+  </div>
+
+<script>
+// Paint canvas
+var c = document.querySelector(".snake");
+var ctx = c.getContext("2d");
+ctx.fillStyle = "#919191";
+ctx.fillRect(0,0,300,400);
+// Paint vertical lines
+for (var x = 0.5; x < 300; x += 10) {
+ctx.moveTo(x, 0);
+ctx.lineTo(x, 400);
+}
+// Paint horizontal lines
+for (var y = 0.5; y < 400; y += 10) {
+ctx.moveTo(0, y);
+ctx.lineTo(300, y);
+}
+
+ctx.strokeStyle = "#c9a349";
+ctx.stroke();
+
+// Variables
+const TRANSVERSE = 30;
+const VERTICAL = 40;
+const LEFT = 1;
+const RIGHT = 2;
+const TOP  = 3;
+const BOTTOM = 4;
+const GAME_START = 1;
+const GAME_STOP = 2;
+const GAME_OVER = 3
+
+//
+var SnakeNode = function (point) {
+  var prevDirection, currDirection, next, pos;
+  pos = point;
+
+  this.getNext = function () {
+    return next;
+  };
+
+  this.setNext = function (el) {
+    next = el;
+  };
+
+  this.setDirection = function(value) {
+      currDirection = value;
+  };
+
+  this.getDirection = function() {
+      return currDirection;
+  };
+
+  this.computePosition = function() {
+      pos = SnakeNode.getNextPoint( pos, currDirection );
+    if (next) {
+      next.computePosition();
+    }
+    if (prevDirection != currDirection) {
+      prevDirection = currDirection;
+      if (next){
+        next.setDirection(currDirection);
+      }
+    }
+  }
+
+  this.getPosition = function(){
+      return pos;
+  };
+};
+
+
+</script>
+</body>
+</html>
