@@ -116,6 +116,351 @@ var SnakeNode = function (point) {
   };
 };
 
+// Describe next point
+SnakeNode.getNextPoint = function (point, direction)
+{
+    var newPoint = {};
+    switch(direction)
+    {
+      case LEFT:
+        newPoint.x = point.x - 1;
+        newPoint.y = point.y ;
+        break;
+      case RIGHT:
+        newPoint.x = point.x + 1;
+        newPoint.y = point.y;
+        break;
+      case TOP:
+        newPoint.x = point.x;
+        newPoint.y = point.y - 1;
+        break;
+      case BOTTOM:
+        newPoint.x = point.x;
+        newPoint.y = point.y + 1;
+        break;
+    }
+    return newPoint;
+};
+//
+var Snake = function( head ) {
+  var snake = head;
+  var isGameover = false;
+  var self = this;
+  //
+  this.addNode = function() {
+    var lastNode =  getLastNode();
+    var point = lastNode.getPosition();
+    var reverse;
+    switch(lastNode.getDirection()) {
+        case LEFT:
+        reverse = RIGHT;
+        break;
+      case RIGHT:
+        reverse = LEFT;
+        break;
+      case TOP:
+        reverse = BOTTOM;
+        break;
+      case BOTTOM:
+        reverse = TOP;
+        break;
+    }
+    var newPoint = SnakeNode.getNextPoint(point, reverse);
+    var node = new SnakeNode(newPoint);
+    node.setDirection(lastNode.getDirection());
+    lastNode.setNext(node);
+  }
+  //
+  this.getAllNodePos = function() {
+      var posList = new Array;
+    var node = snake;
+    do{
+        posList.push(node.getPosition());
+      node = node.getNext();
+    }while(node);
+    return posList;
+  }
+  //
+  this.getLength = function() {
+      var count = 0;
+    var node = snake;
+    while(node) {
+        count ++;
+      node = node.getNext();
+    }
+    return count;
+  }
+  //
+  this.isGameover = function() {
+      return isGameover;
+  }
+  //
+  this.move = function() {
+      if (!isGameover) {
+          snake.computePosition();
+      }
+      checkGameover();
+  }
+  //
+  this.setDirection = function (direction) {
+      if( !isGameover ) snake.setDirection(direction);
+  }
+  //
+  this.getHeadPos = function() {
+      return snake.getPosition();
+  }
+  //
+  this.getHeadDirection = function() {
+      return snake.getDirection();
+  }
+  var checkGameover = function() {
+      var l = snake.getPosition();
+    var cl = self.getAllNodePos();
+    if(l.x < 0 || l.x >= TRANSVERSE || l.y < 0 || l.y >= VERTICAL ) {
+        isGameover = true;
+      return;
+    }
+    for(var i = 0 ; i < cl.length ; i ++) {
+       if(l != cl[i] && cl[i].x == l.x && cl[i].y == l.y) {
+           isGameover = true;
+         return;
+       }
+    }
+  }
+  var getLastNode = function() {
+      var node = snake.getNext();
+    while( node ){
+        var nextNode = node.getNext();
+      if(!nextNode) return node;
+      node = nextNode;
+    }
+    return snake;
+  }
+}
+
+//
+var SnakeGame = function() {
+    var snake ;
+  var moveTimer, randomTimer;
+    var currDirection;
+  var foods = [];
+  var status = GAME_STOP;
+  var context;
+  var self = this;
+  this.onEatOne = function(){};
+  var getRandom = function(notin) {
+      var avaiable = [];
+    for(var y = 0 ; y < VERTICAL ; y ++)
+    {
+         for(var x = 0 ; x < TRANSVERSE; x++ ) {
+         var j = 0;
+         var avaiableFlag = true;
+         while( j < notin.length ){
+           var el = notin[j];
+           if( el.x == x && el.y == y ) {
+            notin.splice(j,1);
+            avaiableFlag = false;
+            break;
+           }
+           j++;
+         }
+         if(avaiableFlag) avaiable.push({ x: x , y: y });
+       }
+    }
+    var rand = Math.floor(Math.random() * avaiable.length);
+    return avaiable[rand];
+  }
+  //
+  var navigate = function(direction) {
+      var sd = snake.getHeadDirection();
+    var d ;
+    if((sd == LEFT || sd == RIGHT) && (direction == TOP || direction == BOTTOM)) d = direction;
+    if((sd == TOP || sd == BOTTOM) && (direction == LEFT || direction == RIGHT)) d = direction;
+    if(d) currDirection = d;
+  }
+  var move = function() {
+      moveTimer = window.setTimeout( move, computeMoveInterval() );
+    if(currDirection) snake.setDirection( currDirection );
+      snake.move();
+    var lc = snake.getHeadPos();
+      for(var i = 0 ; i < foods.length ; i ++) {
+        if(lc.x == foods[i].x && lc.y == foods[i].y) {
+        snake.addNode();
+        self.onEatOne();
+                foods.splice( i, 1 );
+                break;
+      }
+    }
+    if(snake.isGameover()){
+        gameover();
+      return;
+    }
+    draw();
+  }
+  var createFood = function() {
+      var notin = snake.getAllNodePos().concat(foods);
+      var rand = getRandom(notin);
+    foods.push(rand);
+  }
+  var arrayToMap = function(array) {
+    var map = {};
+    for(var i = 0 , point ;  point = array[i++];) map[[point.x , point.y]] = null;
+    return map;
+  }
+  //
+  var getMap = function() {
+      var board = new Array;
+      for (var y = 0 ; y < VERTICAL; y++) {
+          for (var x = 0 ; x < TRANSVERSE ; x++) {
+              board.push({ x: x, y: y });
+          }
+      }
+    var cl = snake.getAllNodePos();
+    var food = arrayToMap(foods);
+    cl = arrayToMap(cl);
+    board = arrayToMap(board);
+    for(var key in cl) board[key] = 'snake';
+    for(var key in food) board[key] = 'food';
+    return board;
+  }
+  //
+  this.getScore = function() {
+     return snake.getLength() - 1;
+  }
+  //
+  this.getLevel = function() {
+      var score = self.getScore();
+    var level = 0;
+    if(score <= 5) level = 1;
+        else if(score <= 12) level = 2;
+        else if(score <= 22) level = 3;
+        else if(score <= 35) level = 4;
+        else if(score <= 50) level = 5;
+        else if(score <= 75) level = 6;
+    else if(score <= 90) level = 7;
+    else if(score <= 100) level = 8;
+    else level = 9;
+        return level;
+  }
+  var computeMoveInterval = function() {
+      var speed = {
+      '1':200,
+      '2':160,
+      '3':120,
+      '4':100,
+      '5':80,
+      '6':60,
+      '7':40,
+      '8':20,
+      '9':10
+    }
+      var level = self.getLevel();
+    return speed[level];
+  }
+  var gameover = function () {
+      status = GAME_OVER;
+      window.clearTimeout(moveTimer);
+      window.clearInterval(foodTimer);
+      unBindEvent();
+      alert('game over');
+  }
+    //
+  this.gameState = function () {
+      return status;
+  }
+  //
+  this.start = function() {
+      status = GAME_START;
+      moveTimer = window.setTimeout(move , computeMoveInterval());
+      foodTimer = window.setInterval(createFood, 5000);
+      bindEvent();
+  }
+  //
+  this.stop = function() {
+      status = GAME_STOP;
+      window.clearTimeout(moveTimer);
+      window.clearInterval(foodTimer);
+      unBindEvent();
+  }
+  this.initialize = function( canvasId ) {
+      var head = new SnakeNode({ x: Math.ceil(TRANSVERSE / 2), y: Math.ceil(VERTICAL / 2) });
+    head.setDirection([LEFT, RIGHT , TOP , BOTTOM][Math.floor(Math.random() * 4)])
+    snake = new Snake(head);
+    var canvas = document.getElementById(canvasId);
+    context = canvas.getContext('2d');
+  }
+    //
+  var draw = function () {
+      context.fillStyle = '#fff';
+      context.fillRect(0, 0, 300, 400);
+      var map = getMap();
+      for (var key in map) {
+          var pointType = map[key];
+          var x = key.split(',')[0];
+          var y = key.split(',')[1];
+          if (pointType == 'snake') {
+              context.fillStyle = '#000';
+          } else if (pointType == 'food') {
+              context.fillStyle = '#f00';
+          } else {
+              continue;
+          }
+          context.fillRect( x * 10, y * 10, 10, 10 );
+      }
+  }
+    //
+  var bindEvent = function () {
+      document.body.onkeydown = function (e) {
+          e = e || window.event;
+          var keyCode = e.keyCode;
+          switch (keyCode) {
+              case 37:
+                  navigate(LEFT);
+                  break;
+              case 38:
+                  navigate(TOP);
+                  break;
+              case 39:
+                  navigate(RIGHT);
+                  break;
+              case 40:
+                  navigate(BOTTOM);
+                  break;
+          }
+      }
+  }
+    //
+  var unBindEvent = function () {
+      document.body.onkeydown = null;
+  }
+}
+//
+var game = new SnakeGame();
+game.initialize("snake");
+game.onEatOne = function() {
+  document.getElementById('score').innerHTML = game.getScore();
+  document.getElementById('level').innerHTML = game.getLevel();
+}
+//
+function toggle(btn)
+{
+  var state = game.gameState();
+  if(state == GAME_STOP) {
+      game.start();
+      btn.value = 'stop';
+  }  else if(state == GAME_START) {
+      game.stop();
+      btn.value = 'start';
+  } else {
+      alert('game over');
+  }
+}
+document.getElementById("start_btn").onclick = function () {
+    toggle(this);
+}
+document.getElementById("new_game_btn").onclick = function () {
+    window.location.reload();
+}
 
 </script>
 </body>
