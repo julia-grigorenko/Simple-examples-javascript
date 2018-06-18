@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Getting Started with JavaScript</title>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+    body, .jumbotron { padding: 30px; }
+    body    {
+      background-image: url('rawpixel-632457-unsplash.jpg');
+      background-size: cover;
+    }
+    .content {
+      font-size: 19px;
+      line-height: 1.5;
+      max-width: 500px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .floater  {
+      margin-bottom: 30px;
+      background: #FFF;
+      border-radius: 5px;
+      transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.4) all;
+      z-index: 11;
+    }
+    .floater input[type=text] {
+      padding: 30px 20px;
+      border: none;
+      box-shadow: none;
+      font-size: 14px;
+      transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.4) all;
+    }
+    .floater-bottom   {
+      padding: 6px 10px 8px;
+      text-align: right;
+      border-top: 1px solid #DDD;
+    }
+    .floater-bottom button {
+      padding: 4px 8px;
+      font-size: 10px;
+    }
+    .overlay  {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: rgba(0, 0, 0, 0.80);
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: 0.3s ease opacity;
+      z-index: 10;
+      pointer-events: none;
+    }
+    body.show-floater .floater {
+      transform: scale(1.1);
+    }
+    body.show-floater .floater input[type=text] {
+      padding: 50px 20px;
+      font-size: 18px;
+    }
+    body.show-floater .overlay {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .bookmark-list {
+      position: relative;
+      z-index: 9;
+    }
+    .bookmark {
+      display: flex;
+      position: relative;
+      justify-content: space-between;
+      font-size: 16px;
+      background: #ffffff;
+      color: #999999;
+      padding: 20px;
+      transition: 0.3s ease all;
+      border-bottom: 1px solid #dddddd;
+    }
+    .bookmark:hover {
+      color:#1ce;
+      text-decoration: none;
+    }
+    .bookmark:first-child {
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+    .bookmark:last-child {
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+      border-bottom: 0;
+    }
+    .bookmark .title {
+      display: flex;
+      align-items: center;
+    }
+
+    .bookmark .glyphicon-remove {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #eeeeee;
+      font-size: 12px;
+      transition: 0.3s ease color;
+      cursor: pointer;
+    }
+
+    .bookmark:hover .glyphicon-remove {
+      color: #aaaaaa;
+    }
+    .bookmark .img {
+      background-color: #dddddd;
+      border-radius: 3px;
+      width: 80px;
+      height: 60px;
+      margin-right: 20px;
+    }
+
+
+  </style>
+</head>
+<body>
+
+  <div class="overlay"></div>
+
+  <div class="floater content">
+    <form class="bookmark-form" action="#" method="post">
+      <div class="floater-top">
+        <input type="text" class="form-control" placeholder="What's on your mind?">
+      </div>
+      <div class="floater-bottom">
+        <button type="submit" class="btn btn-primary btn-sm">Add</button>
+      </div>
+    </form>
+  </div>
+  <div class="bookmarks-list content">
+  </div>
+  <script>
+  // Variables
+    const body = document.body;
+    const input = document.querySelector('input[type=text]');
+    const overlay = document.querySelector('.overlay');
+    const bookmarkList = document.querySelector('.bookmarks-list');
+    const bookmarkForm = document.querySelector('.bookmark-form');
+    const bookmarkInput = bookmarkForm.querySelector('input[type=text]');
+    const btn = document.querySelector('.btn');
+    const bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+
+
+  // Event listeners
+  input.addEventListener('focusin', showFloater);
+  input.addEventListener('focusout', closeFloater);
+  overlay.addEventListener('click', closeFloater);
+  bookmarkForm.addEventListener('submit', createBookmark);
+  bookmarkList.addEventListener('click', removeNote);
+
+
+  // Functions
+  function showFloater() {
+    body.classList.add('show-floater');
+  }
+
+  function closeFloater(e) {
+    console.log(e);
+    if(e.relatedTarget!= null && e.relatedTarget.classList.contains('btn')) {
+      createBookmark(e);
+    }
+    if (body.classList.contains('show-floater')) {
+      body.classList.remove('show-floater');
+    }
+  }
+
+  function createBookmark (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Add a new bookmark to the bookmarks
+    const title = bookmarkInput.value;
+    const bookmark = {
+      title: title
+    };
+
+    bookmarks.push(bookmark);
+    fillBookmarksList(bookmarks);
+    storeBookmarks(bookmarks);
+    bookmarkForm.reset();
+
+    if (body.classList.contains('show-floater')) {
+      body.classList.remove('show-floater');
+    }
+  }
+
+  function fillBookmarksList (bookmarks = []) {
+    const bookmarksHtml = bookmarks.map((bookmark, i) => {
+      return `
+      <a href="#" class="bookmark" data-id="${i}">
+        <div class="img"></div>
+        <div class="title">${bookmark.title}</div>
+        <span class="glyphicon glyphicon-remove"></span>
+      </a>
+      `;
+    }).join('');
+
+    bookmarkList.innerHTML = bookmarksHtml;
+  }
+
+  function storeBookmarks(bookmarks = []) {
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+  }
+
+  function removeNote (e) {
+    // find the index
+    // remove from the bookmarks using splice
+    // fill the listeners
+    // store back to localStorage
+    if (!e.target.matches('.glyphicon-remove')) {return;}
+
+    const index = e.target.parentNode.dataset.id;
+    bookmarks.splice(index,1);
+    fillBookmarksList(bookmarks);
+    storeBookmarks(bookmarks);
+  }
+
+  fillBookmarksList(bookmarks);
+
+  </script>
+</body>
+</html>
